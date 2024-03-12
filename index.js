@@ -4,11 +4,11 @@ const app = express();
 const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server });
 
-//Include Google Speech to Text
+// Include Google Speech to Text
 const speech = require("@google-cloud/speech");
 const client = new speech.SpeechClient();
 
-//Configure Transcription Request
+// Configure Transcription Request
 const request = {
   config: {
     encoding: "MULAW",
@@ -18,11 +18,11 @@ const request = {
   interimResults: true
 };
 
-// Handle Web Socket Connection
+// Handle WebSocket Connection
 wss.on("connection", function connection(ws) {
-console.log("New Connection Initiated");
+  console.log("New Connection Initiated");
 
- let recognizeStream = null;
+  let recognizeStream = null;
 
   ws.on("message", function incoming(message) {
     const msg = JSON.parse(message);
@@ -53,8 +53,10 @@ console.log("New Connection Initiated");
   });
 });
 
+// Serve static files or handle other routes as needed
+app.use(express.static("public"));
 
-
+// Define route to start the WebSocket stream
 app.post("/", (req, res) => {
   res.set("Content-Type", "text/xml");
 
@@ -69,5 +71,8 @@ app.post("/", (req, res) => {
   `);
 });
 
-console.log("Listening at Port 8080");
-server.listen(8080);
+// Listen on the appropriate port
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+});
