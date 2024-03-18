@@ -69,22 +69,16 @@ wss.on("connection", function connection(ws) {
                     .on("error", console.error)
                     .on("data", (data) => {
                         const transcription = data.results[0].alternatives[0].transcript;
-                        partialTranscription += transcription; // Accumulate partial transcription
-                        if (!data.results[0].isFinal) {
-                            // If the transcription is not final, wait for next segment
-                            return;
-                        }
-                        // Check if transcription is different from previous one
-                        if (partialTranscription !== prevTranscription) {
-                            console.log("Transcribed text:", partialTranscription);
+                        // Check if transcription is the same as previous one
+                        if (transcription !== prevTranscription) {
+                            console.log("Transcribed text:", transcription);
                             wss.clients.forEach((client) => {
                                 if (client.readyState === WebSocket.OPEN) {
-                                    client.send(JSON.stringify(partialTranscription));
+                                    client.send(JSON.stringify(transcription));
                                 }
                             });
-                            prevTranscription = partialTranscription; // Update previous transcription
+                            prevTranscription = transcription; // Update previous transcription
                         }
-                        partialTranscription = ""; // Reset partial transcription
                     });
                 break;
             case "start":
